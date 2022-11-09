@@ -1,47 +1,87 @@
-CREATE TABLE players
+CREATE TABLE heroes
 (
-    id int NOT NULL,
+    hero_id SERIAL,
     username VARCHAR NOT NULL,
-    item_id int REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    friend_id int REFERENCES friends (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    invite_id int REFERENCES invites (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    match_id int REFERENCES matches (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT players_pk PRIMARY KEY (id)
+    money int,
+    attack int,
+    health int,
+    deference int,
+    CONSTRAINT heroes_pk PRIMARY KEY (hero_id)
 );
-CREATE TABLE inventory
+CREATE TABLE users
 (
-    id int NOT NULL,
-    count int,
-    item_id int REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    hero_id int REFERENCES heroes (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT inventory_pk PRIMARY KEY (id)
-)
+    user_id SERIAL,
+    login VARCHAR NOT NULL,
+    password VARCHAR NOT NULL,
+    heroes_id int NOT NULL REFERENCES heroes (hero_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    friends_count int,
+    CONSTRAINT users_pk PRIMARY KEY (user_id)
+);
+
+CREATE TABLE items_type
+(
+    type_id SERIAL,
+    name VARCHAR NOT NULL,
+    CONSTRAINT items_type_pk PRIMARY KEY (type_id)
+);
+CREATE TABLE items_color
+(
+    color_id SERIAL,
+    name VARCHAR,
+    CONSTRAINT items_color_pk PRIMARY KEY (color_id)
+);
 CREATE TABLE items
 (
-    id int NOT NULL,
-    name VARCHAR NOT NULL,
-    type int,
-    CONSTRAINT items_pk PRIMARY KEY (id)
+    item_id SERIAL,
+    item_type int NOT NULL REFERENCES items_type (type_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    color int NOT NULL REFERENCES items_color (color_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    health int,
+    deference int,
+    attack int,
+    price int,
+    name VARCHAR,
+    CONSTRAINT items_pk PRIMARY KEY (item_id)
 );
+
+CREATE TABLE inventory
+(
+    inventory_id int NOT NULL,
+    item_id int NOT NULL REFERENCES items (item_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    hero_id int NOT NULL REFERENCES heroes (hero_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT inventory_pk PRIMARY KEY (inventory_id)
+);
+
 CREATE TABLE shops
 (
-    id int NOT NULL,
-    item_id int REFERENCES items (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    isSold boolean,
-    CONSTRAINT shops_pk PRIMARY KEY (id)
+    shop_id SERIAL,
+    hero_id int NOT NULL REFERENCES heroes (hero_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    item_id int NOT NULL REFERENCES items (item_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT shops_pk PRIMARY KEY (shop_id)
+);
+CREATE TABLE relations
+(
+    relation_id SERIAL,
+    name VARCHAR,
+    CONSTRAINT relations_pk PRIMARY KEY (relation_id)
 );
 CREATE TABLE friends
 (
-    id int NOT NULL,
-    player_id int REFERENCES players (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT friends_pk PRIMARY KEY (id)
+    friend_id SERIAL,
+    friend_one int NOT NULL REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    friend_two int NOT NULL REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    relation int NOT NULL REFERENCES relations(relation_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT friends_pk PRIMARY KEY (friend_id)
 );
-CREATE TABLE invites
+
+
+CREATE TABLE updates
 (
-    id int NOT NULL,
-    player_id int REFERENCES players (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    isActive boolean,
-    CONSTRAINT invites_pk PRIMARY KEY (id)
+    update_id SERIAL,
+    description VARCHAR,
+    user_id int NOT NULL REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT updates_pk PRIMARY KEY (update_id)
 );
+
+
 
 
